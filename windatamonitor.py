@@ -54,6 +54,7 @@ CurrDir = module_path()
 LOG_DIR = os.path.join(CurrDir, "log")
 if not os.path.exists(LOG_DIR):
     os.mkdir(LOG_DIR)
+
 sys.stderr = open(os.path.join(CurrDir, "log", "windatamonitor.err"), "a")
 
 # register file - write there datetime and filename that was triggered
@@ -121,7 +122,7 @@ class MyHandler(FileSystemEventHandler):
         #=======================================================================
 
 
-    def my_rolling_window(self, arrays, window, yield_last_array=True):
+    def rolling_window(self, arrays, window, yield_last_array=True):
         """ Native rolling_window may cause problem with memory.
         Thats it, lets use just an ordinal cycle For... """
         # calc step: usually 3 minutes, so window / 3 = 1 minute
@@ -173,7 +174,7 @@ class MyHandler(FileSystemEventHandler):
         # short and long window
         nsta, nlta = int(WINDOW_SHORT * df), int(WINDOW_LONG * df)
         # скользящее (?) окно для анализа файла (по 3 минуты обычно)
-        for ns, ew, z in self.my_rolling_window(data, TOTAL_SAMPLES):
+        for ns, ew, z in self.rolling_window(data, TOTAL_SAMPLES):
             #=== lets run trigger to find Event
             # calculating the characteristic function - для всех каналов
             sum_votes = 0
@@ -263,7 +264,8 @@ class MyHandler(FileSystemEventHandler):
             # calc on and off time
             on_off = trigger_onset(cft, MAX_LEVEL, MIN_LEVEL)
             return on_off
-    
+
+
 def main(Settings):
     """ main func """
     # run observing on FS
